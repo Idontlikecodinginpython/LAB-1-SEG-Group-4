@@ -82,3 +82,33 @@ Hệ thống sử dụng cơ sở dữ liệu `crawler.db` gồm 2 bảng quan h
   - Depth 1: 39 pages
 - **HTTP Distribution:** HTTP 200: 40 pages stored
 - **Total Links Saved:** 9,406 links
+
+
+[Cell 2] Khởi tạo Cấu hình (Seed URL, Allowed Domains, Headers, Delay)
+     │
+     ▼
+ [Cell 3] URL Frontier (deque & set visited) ──> Lấy URL cần cào theo độ sâu
+     │
+     ▼
+ [Cell 7] Gửi HTTP Request (requests.get + Timeout + Kiểm tra HTTP 200)
+     │
+     ▼
+ [Cell 6] Khử nhiễu & Bóc tách HTML (BeautifulSoup: gỡ bỏ script, style, nav...)
+     │
+     ▼
+ [Cell 4] Kiểm tra Trùng lặp Nội dung (DuplicateDetector dùng mã băm SHA-256)
+     │   ├── Nếu trùng: ──> Bỏ qua (Skip)
+     │   └── Nếu mới:  ──> Tiếp tục
+     │
+     ▼
+ [Cell 6] Lọc Ngữ nghĩa & Đường dẫn (is_tech_related & is_valid_tech_url)
+     │   ├── Không phải Tech / Chuyên mục cấm: ──> Bỏ qua
+     │   └── Thỏa mãn điều kiện Tech:          ──> Hợp lệ
+     │
+     ▼
+ [Cell 5 & 7] Lưu trữ vào SQLite Database
+     ├── Lưu thông tin bài viết vào bảng 'pages'
+     └── Trích xuất liên kết con (Links) ──> Lưu vào bảng 'links' & đẩy ngược về URL Frontier
+     │
+     ▼
+ [Cell 8] Kiểm tra & Hiển thị dữ liệu hoàn tất qua Pandas DataFrame
